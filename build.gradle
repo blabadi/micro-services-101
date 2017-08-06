@@ -1,0 +1,54 @@
+/*
+reference: https://medium.com/@hudsonmendes/docker-spring-boot-microservice-with-gradle-9785087e7992
+*/
+
+buildscript {
+	ext {
+		springBootVersion     = "1.5.2.RELEASE"
+		gradleDockerVersion   = "1.2"
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("se.transmode.gradle:gradle-docker:${gradleDockerVersion}")
+	}
+}
+
+apply plugin: "java"
+apply plugin: "application"
+apply plugin: 'docker'
+apply plugin: 'idea'
+apply plugin: "org.springframework.boot"
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    mainClassName       = "com.bashar.microservice101.AppEntry"
+}
+
+jar {
+    baseName = "api-cats"
+    group    = "com.bashar"
+    version  = "0.0.1-SNAPSHOT"
+    manifest { attributes "Main-Class": "com.bashar.microservice101.AppEntry" }
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+	applicationName = jar.baseName
+	dockerfile = file('Dockerfile')
+	doFirst {
+		copy {
+			from jar
+			into "${stageDir}/target"
+		}
+	}
+}
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter-web")
+}

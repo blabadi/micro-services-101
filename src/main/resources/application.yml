@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: cat-microservice-101
+
+logging:
+  level:
+    ROOT: INFO
